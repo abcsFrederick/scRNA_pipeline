@@ -59,7 +59,7 @@ abline(v=mx, lwd=2, col = "blue")
 abline(v=med, lwd=2, col = "orange")
 par(new = T)
 #h<-hist(x,breaks=20, col="grey",freq = FALSE, yaxt='n', ann=FALSE)
-h<-hist(x,breaks=20, col="grey",freq = FALSE, yaxt='n', ann=FALSE, xlim=c(xmin,xmax), xaxp=c(xmin, xmax, xmax/250))
+h<-hist(x,breaks=20, col="grey",freq = FALSE, yaxt='n', ann=FALSE, xlim=c(xmin,xmax), xaxp=c(xmin, xmax, xmax/500))
 lines(d, col = "red", lwd =2)
 mtext(paste("Mean = ", round(mx,2), sep=""), side =3, adj = 0.24,  col= "blue", lwd =2)
 #mtext(round(mx,2), side =3, adj = 0.35, col= "blue")
@@ -265,7 +265,7 @@ dev.off()
 ##Create Silhoutte Plots
 pdf("SilhouettePlots.pdf")
 for (res in runRes){
-  coord <- seur@dr$pca@cell.embeddings[,cidrOUTPUT@nPC]
+  coord <- seur@dr$pca@cell.embeddings[,1:cidrOUTPUT@nPC]
   seur <- SetIdent(seur, ident.use=seur@meta.data[[paste("res.", res, sep="")]])
   clusters <- seur@ident
   d <- dist(coord, method="euclidean")
