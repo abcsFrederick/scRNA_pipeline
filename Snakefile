@@ -50,7 +50,7 @@ samples = sorted(samples)
 dict2 = dict(zip(samples,numcells))
 
 rule all:
-	input: expand("run_{sample}_10x_cellranger_count.err", sample=samples), expand("{sample}/seurat/minRes.txt", sample=samples), expand("{sample}/clusterpro/groupGO.pdf", sample=samples), expand("{sample}/velocyto/{sample}.loom", sample=samples), expand("{sample}/velocyto/velocyto.pdf", sample=samples), expand("{sample}/scran/CellCycle.pdf", sample=samples)
+	input: expand("run_{sample}_10x_cellranger_count.err", sample=samples), expand("{sample}/seurat/seur_10x_cluster_object.rds", sample=samples), expand("{sample}/clusterpro/groupGO_0.8.pdf", sample=samples), expand("{sample}/velocyto/{sample}.loom", sample=samples), expand("{sample}/velocyto/velocyto.pdf", sample=samples), expand("{sample}/scran/CellCycle.pdf", sample=samples)
 
 rule count: 
 	output: err = "run_{sample}_10x_cellranger_count.err", log ="run_{sample}_10x_cellranger_count.log"
@@ -59,14 +59,14 @@ rule count:
 
 rule seurat:
 	input: "run_{sample}_10x_cellranger_count.err"
-	output: rds = "{sample}/seurat/seur_10x_cluster_object.rds", mr = "{sample}/seurat/minRes.txt", gm = "{sample}/seurat/Filtered_Gene_Expression_Matrix.csv"
+	output: rds = "{sample}/seurat/seur_10x_cluster_object.rds", gm = "{sample}/seurat/Filtered_Gene_Expression_Matrix.csv"
 	log: "{sample}/seurat/seurat.log"
 	params: batch = "-l nodes=1:ppn=8,mem=48gb", prefix = "{sample}", prefix2 = "{sample}/outs/filtered_gene_bc_matrices/"+genomename, outdir = "{sample}/seurat"
 	shell: "set -xv; export R_LIBS=/opt/nasapps/applibs/r-3.5.0_libs/;/opt/nasapps/development/R/3.5.0/bin/R  --no-save --args {params.outdir} {params.prefix2} {params.prefix} {config.ref} <{rscripts}/Final_Seurat.R >& {log}"
 	
 rule clusterpro:
-	input: "{sample}/seurat/minRes.txt"
-	output: pdf = "{sample}/clusterpro/groupGO.pdf"
+	input: "{sample}/seurat/seur_10x_cluster_object.rds"
+	output: pdf = "{sample}/clusterpro/groupGO_0.8.pdf"
 	log: "{sample}/clusterpro/clusterpro.log"
 	params: batch = "-l nodes=1:ppn=8", outdir = "{sample}/clusterpro", prefix = "{sample}", prefix2 = "{sample}/seurat"
 	shell: "set -xv; export R_LIBS=/opt/nasapps/applibs/r-3.5.0_libs/;/opt/nasapps/development/R/3.5.0/bin/R --no-save --args {params.outdir} {config.ref} {params.prefix2} {input} <{rscripts}/clusterProfiler_seurat.R >& {log}"	
