@@ -1,6 +1,7 @@
-#Snakefile for single cell pipeline 
-#Ashley Walton
-#CCR-SF IFX 
+# Version: 1.1 beta release
+# Date: September 17, 2018
+# The script was developed by CCR-SF Bioinformatics Group at FNLCR
+# Contact: CCRSF_IFX@nih.gov if you have any questions
 
 import config
 from snakemake.utils import R
