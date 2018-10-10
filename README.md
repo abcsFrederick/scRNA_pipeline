@@ -45,8 +45,7 @@ Snakemake pipeline for Single Cell RNA-seq analysis. Pipeline includes preproces
    viridis
 
  
- * Reference genomes
-   Please install all the reference files:
+ * Please install all the reference files:
    
        mm10:
               transcriptome = "path_to_cell_ranger_download/refdata-cellranger-mm10-1.2.0/mm10"
