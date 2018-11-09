@@ -30,8 +30,9 @@ colnames(emat) <- gsub("x", "", gsub(paste(strsplit(colnames(emat)[1], ":")[[1]]
 colnames(nmat) <- gsub("x", "", gsub(paste(strsplit(colnames(nmat)[1], ":")[[1]][1], ":", sep=""), "", colnames(nmat)))
 
 emat <- emat[,rownames(seur@meta.data)]; nmat <- nmat[,rownames(seur@meta.data)];
-res <- grep("res", colnames(seur@meta.data), value=TRUE)[1]
-seur <- SetIdent(seur, ident.use=seur@meta.data[[res]])
+#res <- grep("res", colnames(seur@meta.data), value=TRUE)[1]
+#seur <- SetIdent(seur, ident.use=seur@meta.data[[res]])
+seur <- SetIdent(seur, ident.use=seur@meta.data[["res0.6"]])
 cluster.label <- seur@ident
 cell.colors <- pagoda2:::fac2col(cluster.label)
 emb <- seur@dr$tsne@cell.embeddings
