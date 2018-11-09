@@ -22,7 +22,7 @@ if config.ref == "hg19":
 if config.ref == "hg38":
 	transcriptome = "/installed_tools/GemCode/cell_ranger_download/refdata-cellranger-GRCh38-1.2.0"
 	gtf = "/installed_tools/GemCode/cell_ranger_download/refdata-cellranger-GRCh38-1.2.0/genes/genes.gtf"
-	vgtf10x = "/is2/projects/CCR-SF/active/RefGenomes/10X_REF/hg38_rmsk.gtf"
+	vgtf10x = "/installed_tools/RefGenomes/10X_REF/hg38_rmsk.gtf"
 	genomename = "GRCh38"
 
 rscripts = "/installed_tools/scripts/R_scripts"
@@ -63,42 +63,33 @@ rule seurat:
 	output: rds = "{sample}/seurat/seur_10x_cluster_object.rds", gm = "{sample}/seurat/Filtered_Gene_Expression_Matrix.csv"
 	log: "{sample}/seurat/seurat.log"
 	params: batch = "-l nodes=1:ppn=8,mem=48gb", prefix = "{sample}", prefix2 = "{sample}/outs/filtered_gene_bc_matrices/"+genomename, outdir = "{sample}/seurat"
-	shell: "set -xv; export R_LIBS=/opt/nasapps/applibs/r-3.5.0_libs/;/opt/nasapps/development/R/3.5.0/bin/R  --no-save --args {params.outdir} {params.prefix2} {params.prefix} {config.ref} <{rscripts}/Final_Seurat.R >& {log}"
+	shell: "set -xv; export R_LIBS=/installed_tools/r-3.5.0_libs/;/installed_tools/R/3.5.0/bin/R  --no-save --args {params.outdir} {params.prefix2} {params.prefix} {config.ref} <{rscripts}/Final_Seurat.R >& {log}"
 	
 rule clusterpro:
 	input: "{sample}/seurat/seur_10x_cluster_object.rds"
 	output: pdf = "{sample}/clusterpro/groupGO_0.8.pdf"
 	log: "{sample}/clusterpro/clusterpro.log"
 	params: batch = "-l nodes=1:ppn=8", outdir = "{sample}/clusterpro", prefix = "{sample}", prefix2 = "{sample}/seurat"
-	shell: "set -xv; export R_LIBS=/opt/nasapps/applibs/r-3.5.0_libs/;/opt/nasapps/development/R/3.5.0/bin/R --no-save --args {params.outdir} {config.ref} {params.prefix2} {input} <{rscripts}/clusterProfiler_seurat.R >& {log}"	
+	shell: "set -xv; export R_LIBS=/installed_tools/r-3.5.0_libs/;/installed_tools/R/3.5.0/bin/R --no-save --args {params.outdir} {config.ref} {params.prefix2} {input} <{rscripts}/clusterProfiler_seurat.R >& {log}"	
 
 rule pvelocyto:
     input: "run_{sample}_10x_cellranger_count.err"
     output: out = "{sample}/velocyto/{sample}.loom"
     log: "{sample}/velocyto/pvelocyto.log"
     params: batch = "-l nodes=1:ppn=16", prefix = "{sample}"
-    shell: "export PATH=/installed_tools/Anaconda/3.6/install/bin:$PATH; export PATH=/opt/nasapps/development/samtools/1.7/bin/:$PATH; export PYTHONPATH=/installed_tools/velocyto/lib/python3.6/site-packages/; {velocyto} run10x -@ 16 --samtools-memory 48000 -m {vgtf10x} {params.prefix} {gtf} >& {log}"	
+    shell: "export PATH=/installed_tools/Anaconda/3.6/install/bin:$PATH; export PATH=/installed_tools/samtools/1.7/bin/:$PATH; export PYTHONPATH=/installed_tools/velocyto/lib/python3.6/site-packages/; {velocyto} run10x -@ 16 --samtools-memory 48000 -m {vgtf10x} {params.prefix} {gtf} >& {log}"	
 	
 rule svelocyto:
     input: loom = "{sample}/velocyto/{sample}.loom", rds = "{sample}/seurat/seur_10x_cluster_object.rds"
     output: "{sample}/velocyto/velocyto.pdf" 
     log: "{sample}/velocyto/svelocyto.log"
     params: batch = "-l nodes=1:ppn=8,mem=64gb", prefix = "{sample}/velocyto"
-    shell: "export R_LIBS=/opt/nasapps/applibs/r-3.5.0_libs/;/opt/nasapps/development/R/3.5.0/bin/R --no-save --args {params.prefix} {input.loom} {input.rds} < {rscripts}/velocyto_seurat.R >& {log}"
+    shell: "export R_LIBS=/installed_tools/r-3.5.0_libs/;/installed_tools/R/3.5.0/bin/R --no-save --args {params.prefix} {input.loom} {input.rds} < {rscripts}/velocyto_seurat.R >& {log}"
 	
 rule scran:
     input: "{sample}/seurat/Filtered_Gene_Expression_Matrix.csv"
     output: cellcycle = "{sample}/scran/CellCycle.pdf", lastplot = "{sample}/scran/ExpressionPlot.pdf"
     log: "{sample}/scran/scranp.log"
     params: batch = "-l nodes=1:ppn=8,mem=64gb", outdir = "{sample}/scran"
-    shell: "set -xv; export R_LIBS=/opt/nasapps/applibs/r-3.5.0_libs; /opt/nasapps/development/R/3.5.0/bin/R --no-save --args {input} {params.outdir} {config.ref} <{rscripts}/scran_cellcyclePlot.R >& {log}"
-	
-onsuccess:
-    success = "Yes"
-    al = analysis
-    shell(r'''python /is2/projects/CCR-SF/active/Software/scripts/bin/sendmail.py {success} {al}''')
+    shell: "set -xv; export R_LIBS=/installed_tools/r-3.5.0_libs/; /installed_tools/R/3.5.0/bin/R --no-save --args {input} {params.outdir} {config.ref} <{rscripts}/scran_cellcyclePlot.R >& {log}"
 
-onerror:
-    success = "No"
-    al = analysis
-    shell(r'''python /is2/projects/CCR-SF/active/Software/scripts/bin/sendmail.py {success} {al}''')
