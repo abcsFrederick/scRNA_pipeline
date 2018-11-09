@@ -132,6 +132,12 @@ dev.off()
 #We filter out cells that have unique gene counts over 6000 or higher mitochondrial or ribosomal protein percentages
 seur <- SubsetData(seur, subset.name = "nGene", accept.high = 6000)
 seur <- SubsetData(seur, subset.name = "percent.mito", accept.high = 0.05)
+
+pdf("VlnPlot-Filtered.pdf")
+par(mfrow = c(10,1))
+VlnPlot(seur, c("nGene", "nUMI", "percent.mito"), nCol = 3)
+dev.off()
+
 pdf("Gene_UMI_plot.pdf")
 GenePlot(seur, "nUMI", "nGene")
 dev.off()
@@ -229,7 +235,7 @@ dev.off()
 #dev.off()
 
 #run second steps
-resolutions <- c(0.1, 0.3, 0.5, 0.8)
+resolutions <- c(0.1, 0.3, 0.6, 0.8)
 
 #seur <- RunTSNE(seur, dims.use=1:16, do.fast=T)
 seur <- RunTSNE(seur, dims.use=1:cidrOUTPUT@nPC, do.fast=T)
