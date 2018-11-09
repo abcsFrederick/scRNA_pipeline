@@ -63,8 +63,9 @@ Snakemake pipeline for Single Cell RNA-seq analysis. Pipeline includes preproces
 
 ## Software Installation
 
-   Please download and install all software tool acoording to the specific tool installation instruction. 
+   Please download and install all software tools acoording to the specific tool installation instruction. 
    Please download and install the snakemake file from this software package.
+   The snakefile will need to be altered to point to the actual package installation locations.
 
  
    cellranger = "path_to_cell_ranger_download/cellranger-2.2.0/cellranger-cs/2.2.0/bin/cellranger"
@@ -74,10 +75,12 @@ Snakemake pipeline for Single Cell RNA-seq analysis. Pipeline includes preproces
 
 
 Once the config file is filled in, then submit submit.sh as a job to run snakemake.
- 
+``` 
 qsub submit.sh
-  
-  
+```
+
+## Running the pipeline
+More detailed information about how to run the pipeline can be found on the [wiki](https://github.com/abcsFrederick/scRNA_pipeline/wiki/Single-Cell-RNA-Pipeline-Documentation).
 
 ## Contact
 
