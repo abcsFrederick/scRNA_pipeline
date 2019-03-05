@@ -75,8 +75,6 @@ temp_postFgenes <- Matrix::rowSums(eb_rawF) > 0
 eb1p <- SingleCellExperiment(assays=list(counts = as.matrix(eb_rawF)), rowData=list(feature_symbol=rownames(eb_rawF)), colData=list(barcode=colnames(eb_rawF)))
 
 #drop mito 
-library(scater)
-
 if (species == "human") {
   mitoGenePrefix <- "^MT-"
 } else if (species == "mouse") {
@@ -109,7 +107,7 @@ if (species == "human") {
 
 cycScores$phases <- as.factor(cycScores$phases)
 
-pdf("CellCycle.pdf",width=16, height=8)
+png("CellCycle.png",width=16, height=8, units='in', res=300)
 
 ### Visualize cell cycle phase per cell
 cycDlibSize <- tapply(eb1$total_counts,cycScores$phases,function(X) density(X))
@@ -175,7 +173,7 @@ eb1F1 <- eb1[!drop_lowCell,]
 dev.off()
 
 #make other plots
-pdf("FilteringPlot.pdf", width=8, height=8)
+png("FilteringPlot.png", width=8, height=8, units='in', res=300)
 layout(matrix(c(2,1,0,3),2),c(7,1.4),c(1.4,7))
 par(mar=c(3,3,0,0),mgp=2:0)
 plot(geneDetect~libSize,data=cS,
@@ -211,7 +209,7 @@ dev.off()
 
 
 #mito filtering plot
-pdf("MitoFiltering.pdf", width=16, height=8)
+png("MitoFiltering.png", width=16, height=8, units='in', res=300)
 layout(matrix(c(1,2,4,3,0,5),2),c(4.3,4.2,0.5),c(0.5,4))
 par(mar=c(0,3,3,1),mgp=2:0)
 plot.new()
@@ -244,7 +242,7 @@ barplot(hist(eb1p$pct_counts_feature_control,breaks=100,plot=F)$counts,
 dev.off()
 
 ##expression plot
-pdf("ExpressionPlot.pdf", width=16, height=8)
+png("ExpressionPlot.png", width=16, height=8, units='in', res=300)
 iH <- 101-cut(log10(geneStatsR[order(geneStatsR$cellMax,decreasing=F),"cellMax"]),breaks=100,labels=F)
 layout(matrix(c(2,1,4,0,3,0,6,5,8,0,7,0),3),c(3.6,.6,3.6,.6),c(.6,3.6,.4))
 par(mar=c(3,3,0,0),mgp=2:0)

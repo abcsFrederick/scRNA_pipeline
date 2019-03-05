@@ -61,15 +61,18 @@ for (res in resolutions) {
   }
   
   ids = list()
-  for(i in clusters){
-    test <- bitr(result[[i]], fromType = "SYMBOL", toType = "ENTREZID", OrgDb = orgdb)
-    ids[paste('X', i, sep="")] <- list(test$ENTREZID)
+  for (i in clusters) {
+  	try({
+  		test <- bitr(result[[i]], fromType = "SYMBOL", toType = "ENTREZID", OrgDb = orgdb)
+  		ids[paste("X", i, sep = "")] <- list(test$ENTREZID)
+  	})
   }
   
   try({
     ck <- compareCluster(geneCluster = ids, fun = "enrichKEGG", organism=organism)#, OrgDb = "org.Mm.eg.db")
-    ht = max(7, min(ceiling(sum(ck@compareClusterResult$Count > 0)/4), ceiling(categories*length(clusters)/4)))
-    pdf(paste("enrichKegg_", res, ".pdf", sep=""), height=ht)
+    ht = max(7, (min(ceiling(sum(ck@compareClusterResult$Count > 0)/4), ceiling(categories*length(clusters)/4))))
+    wt = max(ceiling(max(nchar(ck@compareClusterResult$Description))/8+length(ids)/4), 7)
+    png(paste("enrichKegg_", res, ".png", sep=""), height=ht, width=wt, units='in', res=300)
     print(dotplot(ck, showCategory=categories))
     dev.off()
   })
@@ -77,15 +80,15 @@ for (res in resolutions) {
     ck <- compareCluster(geneCluster = ids, fun = "enrichGO", OrgDb = orgdb)
     ht = max(7, min(ceiling(sum(ck@compareClusterResult$Count > 0)/4), ceiling(categories*length(clusters)/4)))
     wt = max(ceiling(max(nchar(ck@compareClusterResult$Description))/8), 7)
-    pdf(paste("enrichGO_", res, ".pdf", sep=""), height=ht, width=wt)
+    png(paste("enrichGO_", res, ".png", sep=""), height=ht, width=wt, units='in', res=300)
     print(dotplot(ck, showCategory=categories))
     dev.off()
   })
   try({
     ck <- compareCluster(geneCluster = ids, fun = "groupGO", ont="BP", OrgDb = orgdb)
     #ht = max(7, min(ceiling(sum(ck@compareClusterResult$Count > 0)/4), ceiling(categories*length(clusters)/4)))
-    wt = max(ceiling(max(nchar(as.character(ck@compareClusterResult$Description)))/8), 7)
-    pdf(paste("groupGO_", res, ".pdf", sep=""), width=wt)
+    wt = max(ceiling(max(nchar(as.character(ck@compareClusterResult$Description)))/8+length(ids)/4), 7)
+    png(paste("groupGO_", res, ".png", sep=""), height=7, width=wt, units='in', res=300)
     print(dotplot(ck, showCategory=categories))
     dev.off()
   })

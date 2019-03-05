@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
-# Version: 1.1 beta release
-# Date: September 17, 2018
+# Version: 1.2 beta release
+# Date: January 9, 2019
 # The script was developed by CCR-SF Bioinformatics Group at FNLCR
 # Contact: CCRSF_IFX@nih.gov if you have any questions
 #Process 10x genomics output with Seurat package for single cell RNA-seq data
@@ -9,7 +9,7 @@
 library(dplyr)
 library(Matrix)
 library(Seurat)
-library(cidr)
+library(URD)
 library(cluster)
 library(scClustViz)
 
@@ -53,7 +53,7 @@ h<-hist(x, breaks=20, col="grey",  labels = TRUE, yaxt='n', xlab = "Number of Ge
 #xmin <- min(h$breaks)
 xmin <- 0
 xmax <- max(roundUp(h$breaks, 500))
-pdf("GenesPerBarcodeEditedPlot.pdf")
+png("GenesPerBarcodeEditedPlot.png", height=7, width=7, units='in', res=300)
 h<-hist(x, breaks=20, col="grey",  labels = TRUE, yaxt='n', xlab = "Number of Genes", ylab = "Number of Cells", main = name, xlim=c(xmin,xmax), xaxp=c(xmin, xmax, xmax/500))
 abline(v=mx, lwd=2, col = "blue")
 abline(v=med, lwd=2, col = "orange")
@@ -87,7 +87,7 @@ h<-hist(x, breaks=20, col="grey",  labels = TRUE, yaxt='n', xlab = "Number of Ce
 #xmin <- min(h$breaks)
 xmin <- 0
 xmax <- max(roundUp(h$breaks, 100))
-pdf("CellsPerGenePlot.pdf")
+png("CellsPerGenePlot.png", height=7, width=7, units='in', res=300)
 h<-hist(x, breaks=20, col="grey",  labels = TRUE, yaxt='n', xlab = "Number of Cells", ylab = "Number of Genes", main = name, xlim=c(xmin, xmax), xaxp=c(xmin, xmax, xmax/100))
 abline(v=mx, lwd=2, col = "blue")
 abline(v=med, lwd=2, col = "orange")
@@ -113,7 +113,7 @@ if (genome == "hg19") {
 	percent.mito <- colSums(as.matrix(seur@data[mito.genes, ]))/colSums(as.matrix(seur@data))
 }
 if (genome == "hg38") {
-        mito.genes <- grep("^MT-", x=rownames(x=seur@data), value = T)
+  mito.genes <- grep("^MT-", x=rownames(x=seur@data), value = T)
 	percent.mito <- colSums(as.matrix(seur@data[mito.genes, ]))/colSums(as.matrix(seur@data))
 }
 seur <- AddMetaData(seur, percent.mito, "percent.mito")
@@ -149,42 +149,21 @@ saveRDS(seur, file = "seur_10x_preprocessed_object.rds")
 
 
 
-###CIDR
+###URD
 #inputTags <- as.matrix(read.csv(expressionFile, row.names = 1))
-inputTags <- as.matrix(seur@data)
+mat1 <- as.matrix(seur@data)
+test <- createURD(count.data = mat1, min.cells=3, min.counts=3)
+test <- calcPCA(test, mp.factor = 2)
+write.table(test@pca.sig,"URD.txt")
+pdf("URD.pdf")
+pcSDPlot(test)
+dev.off()
 
-cidrOUTPUT <- NULL
-cidrOUTPUT <- scDataConstructor(inputTags)
-cidrOUTPUT <- determineDropoutCandidates(cidrOUTPUT)
-cidrOUTPUT <- tryCatch({
-  cidrOUTPUT <- wThreshold(cidrOUTPUT)
-  cidrOUTPUT <- scDissim(cidrOUTPUT)
-  cidrOUTPUT <- scPCA(cidrOUTPUT)
-  pdf('cidr_variation.pdf')
-  plot(cidrOUTPUT@variation, xlim = c(0, 20))
-  dev.off()
-  cidrOUTPUT <- nPC(cidrOUTPUT)
-},
-error = function(cond) {
-  print(cond)
-  print("Running wThreshold with threshold of 1")
-  cidrOUTPUT <- wThreshold(cidrOUTPUT, 1)
-  cidrOUTPUT <- scDissim(cidrOUTPUT)
-  cidrOUTPUT <- scPCA(cidrOUTPUT)
-  pdf('cidr_variation_thresh1.pdf')
-  plot(cidrOUTPUT@variation, xlim = c(0, 20))
-  dev.off()
-  cidrOUTPUT <- nPC(cidrOUTPUT)
-})
-
-write(cidrOUTPUT@nPC, "cidr_nPC.txt")
-
-
-
+numPCs <- sum(test@pca.sig)
 
 ##Continue Seurat analysis
 
-seur@misc[["cidr_nPCs"]] <- cidrOUTPUT@nPC
+seur@misc[["udr_nPCs"]] <- sum(test@pca.sig)
 
 seur <- FindVariableGenes(object = seur, x.low.cutoff = 0, y.cutoff = 0.8)
 #regress out mitochondrial (unwanted source of variation)
@@ -197,7 +176,7 @@ seur <- ScaleData(object = seur, vars.to.regress = c("percent.mito", "nUMI"), ge
 
 #cannot run this function without above MeanVarPlot function
 #Perform linear dimensional reduction
-seur <- RunPCA(seur, pc.genes = seur@var.genes, do.print = TRUE, pcs.print = 5, genes.print = 5)
+seur <- RunPCA(seur, pc.genes = seur@var.genes, pcs.compute=max(20,numPCs), do.print = TRUE, pcs.print = 5, genes.print = 5)
 seur <- ProjectPCA(seur)
 #PrintPCA(seur, pcs.print = 1:5, genes.print = 5, use.full = TRUE)
 pdf("VizPCAPlot.pdf")
@@ -238,22 +217,33 @@ dev.off()
 resolutions <- c(0.1, 0.3, 0.6, 0.8)
 
 #seur <- RunTSNE(seur, dims.use=1:16, do.fast=T)
-seur <- RunTSNE(seur, dims.use=1:cidrOUTPUT@nPC, do.fast=T)
+seur <- RunTSNE(seur, dims.use=1:numPCs, do.fast=T)
+write.csv(seur@dr$tsne@cell.embeddings, file = "tSNECoordinates.csv")
+seur <- RunUMAP(seur, dims.use=1:numPCs)
+write.csv(seur@dr$umap@cell.embeddings, file = "UMAPCoordinates.csv")
 
 runRes <- c()
 tsnePlots <- list()
+umapPlots <- list()
 for (res in resolutions) {
-  seur <- FindClusters(seur, dims.use=1:cidrOUTPUT@nPC, resolution = res, print.output = 0, save.SNN = T)
-  #pdf(paste("TSNEPlotwith",cidrOUTPUT@nPC,"PCs_", res, ".pdf", sep=""))
-  tsne <- TSNEPlot(seur) + ggtitle(paste(cidrOUTPUT@nPC,"PCs_res", res, sep="")) +
+  seur <- FindClusters(seur, dims.use=1:numPCs, resolution = res, print.output = 0, save.SNN = T)
+  tsne <- TSNEPlot(seur) + ggtitle(paste(numPCs,"PCs_res", res, sep="")) +
     theme(plot.title = element_text(hjust = 0.5))
   tsnePlots[[as.character(res)]] <- tsne
-  #dev.off()
-  
+  png(paste("TSNEPlotwith",numPCs,"PCs_", res, ".png", sep=""), height=7, width=7, units='in', res=300)
+  print(tsne)
+  dev.off()
+  umap <- DimPlot(seur, reduction.use="umap") + ggtitle(paste(numPCs,"PCs_res", res, sep="")) +
+    theme(plot.title = element_text(hjust = 0.5))
+  umapPlots[[as.character(res)]] <- umap
+  png(paste("UMAPPlotwith",numPCs,"PCs_", res, ".png", sep=""), height=7, width=7, units='in', res=300)
+  print(umap)
+  dev.off()
+
   try({
     seur.markers <- FindAllMarkers(object = seur, thresh.use = 0.25, only.pos=TRUE)
     write.csv(seur.markers %>% group_by(cluster) %>% top_n(-100,
-                                                           p_val), paste("top100markers_pc", cidrOUTPUT@nPC, "_res", res, ".csv", sep = ""))
+                                                           p_val), paste("top100markers_pc", numPCs, "_res", res, ".csv", sep = ""))
     saveRDS(seur.markers, paste("markers_res", res, ".rds", sep = ""))
     runRes <- append(runRes, res)})
 }
@@ -267,21 +257,26 @@ for (res in tsnePlots){
 }
 dev.off()
 
+pdf("UMAPPlots.pdf")
+for (res in umapPlots){
+  print(res)
+}
+dev.off()
+
 
 ##Create Silhoutte Plots
-pdf("SilhouettePlots.pdf")
 for (res in runRes){
-  coord <- seur@dr$pca@cell.embeddings[,1:cidrOUTPUT@nPC]
+  coord <- seur@dr$pca@cell.embeddings[,1:numPCs]
   seur <- SetIdent(seur, ident.use=seur@meta.data[[paste("res.", res, sep="")]])
   clusters <- seur@ident
   d <- dist(coord, method="euclidean")
   sil<-silhouette(as.numeric(clusters), dist=d)
   #silPlot <- recordPlot()
+  pdf(paste0("SilhouettePlot_res",res,".pdf"))#, height=7, width=7, units='in', res=300)
   plot(sil, col=as.factor(clusters[order(clusters, decreasing=FALSE)]), main=paste("Silhouette plot of Seurat clustering - resolution ", res, sep=""), lty=2)
   abline(v=mean(sil[,3]), col="red4", lty=2)
+  dev.off()
 }
-dev.off()
-
 
 ##Remove resolutions that failed marker generation
 print(runRes)
@@ -297,7 +292,7 @@ tryCatch({
   data_for_scClustViz <- readFromSeurat(seur)
   DE_for_scClustViz <- clusterWiseDEtest(data_for_scClustViz,exponent=exp(1))
   save(data_for_scClustViz,DE_for_scClustViz,file="for_scClustViz.RData")
-}, 
+},
 error = function(cond) {
   print(cond)
 })
