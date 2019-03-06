@@ -8,6 +8,7 @@ Snakemake pipeline for Single Cell RNA-seq analysis. Pipeline includes preproces
  
    Install all the following R packages:
    
+   ```
    cluster
    clusterProfiler
    dplyr
@@ -26,7 +27,7 @@ Snakemake pipeline for Single Cell RNA-seq analysis. Pipeline includes preproces
    URD
    velocyto.R
    viridis
-
+   ```
  
  * Please install all the reference files:
    
