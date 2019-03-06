@@ -8,40 +8,23 @@ Snakemake pipeline for Single Cell RNA-seq analysis. Pipeline includes preproces
  
    Install all the following R packages:
    
-   cidr
-   
    cluster
-   
    clusterProfiler
-   
    dplyr
-   
    igraph
-   
    MASS
-   
    Matrix
-   
-   org.Hs.eg.db
-   
+   org.Hs.eg.db   
    org.Mm.eg.db
-   
    pagoda2
-   
    RColorBrewer
-   
    scales
-   
    scater
-   
    scClustViz
-   
    scran
-   
-   Seurat
-   
+   Seurat (version 2)
+   URD
    velocyto.R
-   
    viridis
 
  
