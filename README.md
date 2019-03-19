@@ -34,16 +34,16 @@ Snakemake pipeline for Single Cell RNA-seq analysis. Pipeline includes preproces
  * Please install all the reference files:
    
        mm10:
-              transcriptome = "path_to_cell_ranger_download/refdata-cellranger-mm10-1.2.0/mm10"
-       gtf = "path_to_cell_ranger_download/refdata-cellranger-mm10-1.2.0/genes/genes.gtf"
+              transcriptome = "path_to_cell_ranger_download/refdata-cellranger-mm10-3.0.0"
+       gtf = "path_to_cell_ranger_download/refdata-cellranger-mm10-3.0.0/genes/genes.gtf"
               vgtf10x = "path_to_cell_ranger_download/RefGenomes/10X_REF/mm10_rmsk.gtf"
              
        hg19:
-              transcriptome = "/path_to_cell_ranger_download/refdata-cellranger-1.1.0/hg19"
-              gtf = "path_to_cell_ranger_download/refdata-cellranger-mm10-1.1.0/genes/genes.gtf"
+              transcriptome = "path_to_cell_ranger_download/refdata-cellranger-hg19-3.0.0/"
+              gtf = "path_to_cell_ranger_download/refdata-cellranger-hg19-3.0.0/genes/genes.gtf"
        hg38:
-              transcriptome = "path_to_cell_ranger_download/refdata-cellranger-GRCh38-1.2.0"
-              gtf = "path_to_cell_ranger_download/refdata-cellranger-GRCh38-1.2.0/genes/genes.gtf"
+              transcriptome = "path_to_cell_ranger_download/refdata-cellranger-GRCh38-3.0.0"
+              gtf = "path_to_cell_ranger_download/refdata-cellranger-GRCh38-3.0.0/genes/genes.gtf"
               vgtf10x = "path_to_cellranger_download/RefGenomes/10X_REF/hg38_rmsk.gtf"
         
 
