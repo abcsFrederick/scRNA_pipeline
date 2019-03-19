@@ -19,11 +19,13 @@ Snakemake pipeline for Single Cell RNA-seq analysis. Pipeline includes preproces
    org.Mm.eg.db
    pagoda2
    RColorBrewer
+   reshape2
    scales
    scater
    scClustViz
    scran
    Seurat (version 2)
+   SingleR
    URD
    velocyto.R
    viridis
