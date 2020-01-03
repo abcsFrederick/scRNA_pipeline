@@ -1,5 +1,7 @@
-# scRNA_pipeline
-Snakemake pipeline for Single Cell RNA-seq analysis. Pipeline includes preprocessing,and outlier cells filtering, clustering analysis, annotation and visualization. 
+# iSCAP - An Integrated Single Cell Analysis Pipeline
+Snakemake pipeline for Single Cell RNA-seq analysis. The integrated Single Cell Analysis Pipeline (iSCAP) enables combining different methods including quality control, preprocessing, normalization, batch effect correction, clustering, marker gene and subpopulation identification, cell type annotation, multi-sample differential expression analysis. 
+
+The iSCAP allows users to select and apply their preferred combination of the software tools supported in the pipeline and define sample groups for comparison analysis.  iSCAP also includes gene set enrichment and network analysis, it generates HTML-based nozzle reports which allow users to browse the results obtained in each stage of the pipeline. 
 
 
 ## Prerequisites
