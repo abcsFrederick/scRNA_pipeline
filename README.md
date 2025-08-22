@@ -66,6 +66,10 @@ Once the config file is filled in, then submit submit.sh as a job to run snakema
 ``` 
 qsub submit.sh
 ```
+## Workflow
+The following graphic gives an overview of the entire RNASeq workflow:
+
+<img align="center" src="https://github.com/abcsFrederick/scRNA_pipeline/blob/master/docs/Workflow.png?raw=true">
 
 ## Running the pipeline
 More detailed information about how to run the pipeline can be found on the [wiki](https://github.com/abcsFrederick/scRNA_pipeline/wiki/Single-Cell-RNA-Pipeline-Documentation).
