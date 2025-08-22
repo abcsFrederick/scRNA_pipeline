@@ -36,16 +36,16 @@ The iSCAP allows users to select and apply their preferred combination of the so
  * Please install all the reference files:
    
        mm10:
-              transcriptome = "path_to_cell_ranger_download/refdata-cellranger-mm10-3.0.0"
-       gtf = "path_to_cell_ranger_download/refdata-cellranger-mm10-3.0.0/genes/genes.gtf"
+              transcriptome = "path_to_cell_ranger_download/refdata-gex-mm10-2020-A"
+       gtf = "path_to_cell_ranger_download/refdata-gex-mm10-2020-A/genes/genes.gtf"
               vgtf10x = "path_to_cell_ranger_download/RefGenomes/10X_REF/mm10_rmsk.gtf"
              
        hg19:
               transcriptome = "path_to_cell_ranger_download/refdata-cellranger-hg19-3.0.0/"
               gtf = "path_to_cell_ranger_download/refdata-cellranger-hg19-3.0.0/genes/genes.gtf"
        hg38:
-              transcriptome = "path_to_cell_ranger_download/refdata-cellranger-GRCh38-3.0.0"
-              gtf = "path_to_cell_ranger_download/refdata-cellranger-GRCh38-3.0.0/genes/genes.gtf"
+              transcriptome = "path_to_cell_ranger_download/refdata-gex-GRCh38-2020-A"
+              gtf = "path_to_cell_ranger_download/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
               vgtf10x = "path_to_cellranger_download/RefGenomes/10X_REF/hg38_rmsk.gtf"
         
 
@@ -56,7 +56,7 @@ The iSCAP allows users to select and apply their preferred combination of the so
    The snakefile will need to be altered to point to the actual package installation locations.
 
  
-   cellranger = "path_to_cell_ranger_download/cellranger-2.2.0/cellranger-cs/2.2.0/bin/cellranger"
+   cellranger = "path_to_cell_ranger_download/cellranger-9.0.1/cellranger-cs/9.0.1/bin/cellranger"
    
    velocyto = "path_to_velocyto_tools/velocyto/bin/velocyto"
 
